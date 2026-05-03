@@ -30,8 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — never commit real secrets
+.env
+.env*.local
+.env.production
+.env.development
+# .env.example is safe to commit (placeholders only)
 
 # vercel
 .vercel
@@ -39,3 +43,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/lib/generated/prisma
+
+# Claude Code session data
+.claude/
+
+# Local dev startup script (contains machine-specific paths)
+start.sh
+
+# Prisma migrations lock (keep schema, ignore lock file if present)
+prisma/migrations/migration_lock.toml

@@ -1,0 +1,504 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  phone               String?              @unique
+  fullNameAr          String?
+  fullNameEn          String?
+  nationalId          String?              @unique
+  nationalIdVerified  Boolean              @default(false)
+  avatarUrl           String?
+  role                UserRole             @default(GUEST)
+  preferredLocale     String               @default("ar")
+  whatsappNumber      String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  banReason           String?
+  bannedAt            DateTime?
+  nationalIdImageUrl  String?
+  onboardingStep      Int                  @default(0)
+  otpCode             String?
+  otpExpiresAt        DateTime?
+  status              UserStatus           @default(ACTIVE)
+  guestBookings       Booking[]            @relation("GuestBookings")
+  guestConversations  Conversation[]       @relation("GuestConversations")
+  hostConversations   Conversation[]       @relation("HostConversations")
+  sentDirectMessages  DirectMessage[]      @relation("SentDirectMessages")
+  disputes            Dispute[]            @relation("DisputeInitiator")
+  guestReviews        GuestReview[]        @relation("GuestReviewTarget")
+  hostGuestReviews    GuestReview[]        @relation("GuestReviewAuthor")
+  listings            Listing[]
+  listingReports      ListingReport[]
+  messages            Message[]
+  notifications       Notification[]
+  passwordResetTokens PasswordResetToken[]
+  payoutAccount       PayoutAccount?
+  reviews             Review[]
+  warnings            UserWarning[]
+  wishlistItems       WishlistItem[]
+}
+
+model Listing {
+  id                   String             @id @default(uuid())
+  hostId               String
+  titleAr              String
+  titleEn              String
+  descriptionAr        String
+  descriptionEn        String
+  governorate          String
+  city                 String
+  compound             String?
+  addressLine          String?
+  latitude             Float?
+  longitude            Float?
+  propertyType         PropertyType
+  bedrooms             Int
+  bathrooms            Int
+  maxGuests            Int
+  areaSqm              Float?
+  floor                Int?
+  pricePerNight        Decimal            @db.Decimal(10, 2)
+  weeklyDiscount       Float?
+  monthlyDiscount      Float?
+  cleaningFee          Decimal?           @db.Decimal(10, 2)
+  securityDeposit      Decimal?           @db.Decimal(10, 2)
+  minimumNights        Int                @default(1)
+  maximumNights        Int?
+  instantBook          Boolean            @default(false)
+  advanceBookingDays   Int                @default(365)
+  amenities            String[]
+  status               ListingStatus      @default(DRAFT)
+  isLicensed           Boolean            @default(false)
+  licenseNumber        String?
+  bnplEnabled          Boolean            @default(true)
+  totalBookings        Int                @default(0)
+  averageRating        Float?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  cancellationPolicy   CancellationPolicy @default(MODERATE)
+  checkInTime          String?
+  checkOutTime         String?
+  houseRulesAr         String?
+  houseRulesEn         String?
+  icalFeedUrl          String?
+  licenseUrl           String?
+  partiesAllowed       Boolean            @default(false)
+  petsAllowed          Boolean            @default(false)
+  prepTimeDays         Int                @default(0)
+  smokingAllowed       Boolean            @default(false)
+  weekendPricePerNight Decimal?           @db.Decimal(10, 2)
+  blockedDates         BlockedDate[]
+  bookings             Booking[]
+  conversations        Conversation[]
+  host                 User               @relation(fields: [hostId], references: [id])
+  images               ListingImage[]
+  reports              ListingReport[]
+  pricingOverrides     PricingOverride[]
+  reviews              Review[]
+  seasonalPricing      SeasonalPricing[]
+  wishlistItems        WishlistItem[]
+}
+
+model ListingImage {
+  id        String   @id @default(uuid())
+  listingId String
+  url       String
+  altTextAr String?
+  altTextEn String?
+  order     Int      @default(0)
+  isCover   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model SeasonalPricing {
+  id            String   @id @default(uuid())
+  listingId     String
+  nameAr        String
+  nameEn        String
+  startDate     DateTime
+  endDate       DateTime
+  pricePerNight Decimal  @db.Decimal(10, 2)
+  createdAt     DateTime @default(now())
+  listing       Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id                    String        @id @default(uuid())
+  listingId             String
+  guestId               String
+  checkIn               DateTime
+  checkOut              DateTime
+  nights                Int
+  adultsCount           Int           @default(1)
+  childrenCount         Int           @default(0)
+  nightlyTotal          Decimal       @db.Decimal(10, 2)
+  cleaningFee           Decimal       @default(0) @db.Decimal(10, 2)
+  serviceFeeGuest       Decimal       @db.Decimal(10, 2)
+  serviceFeeHost        Decimal       @db.Decimal(10, 2)
+  totalGuestPays        Decimal       @db.Decimal(10, 2)
+  totalHostReceives     Decimal       @db.Decimal(10, 2)
+  paymentMethod         PaymentMethod
+  paymentStatus         PaymentStatus @default(PENDING)
+  paymobOrderId         String?
+  valuPlanId            String?
+  paidAt                DateTime?
+  status                BookingStatus @default(PENDING)
+  cancellationReason    String?
+  cancelledAt           DateTime?
+  cancelledBy           String?
+  guestMessage          String?
+  specialRequests       String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  discountAmount        Decimal?      @db.Decimal(10, 2)
+  promoCode             String?
+  specialOffer          Decimal?      @db.Decimal(10, 2)
+  specialOfferExpiresAt DateTime?
+  guest                 User          @relation("GuestBookings", fields: [guestId], references: [id])
+  listing               Listing       @relation(fields: [listingId], references: [id])
+  dispute               Dispute?
+  guestReview           GuestReview?
+  messages              Message[]
+  review                Review?
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  bookingId String
+  senderId  String
+  body      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model Review {
+  id                String   @id @default(uuid())
+  bookingId         String   @unique
+  listingId         String
+  authorId          String
+  overallRating     Int
+  cleanlinessRating Int
+  accuracyRating    Int
+  locationRating    Int
+  valueRating       Int
+  commentAr         String?
+  commentEn         String?
+  hostReplyAr       String?
+  hostReplyEn       String?
+  isVisible         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  author            User     @relation(fields: [authorId], references: [id])
+  booking           Booking  @relation(fields: [bookingId], references: [id])
+  listing           Listing  @relation(fields: [listingId], references: [id])
+}
+
+model GuestReview {
+  id            String   @id @default(uuid())
+  bookingId     String   @unique
+  hostId        String
+  guestId       String
+  rating        Int
+  cleanlinessOk Boolean  @default(true)
+  rulesFollowed Boolean  @default(true)
+  comment       String?
+  createdAt     DateTime @default(now())
+  booking       Booking  @relation(fields: [bookingId], references: [id])
+  guest         User     @relation("GuestReviewTarget", fields: [guestId], references: [id])
+  host          User     @relation("GuestReviewAuthor", fields: [hostId], references: [id])
+}
+
+model BlockedDate {
+  id        String   @id @default(uuid())
+  listingId String
+  date      DateTime
+  reason    String?
+  bookingId String?
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, listingId])
+}
+
+model PayoutAccount {
+  id            String   @id @default(uuid())
+  hostId        String   @unique
+  bankName      String
+  accountNumber String
+  accountName   String
+  iban          String?
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  host          User     @relation(fields: [hostId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  titleAr   String
+  titleEn   String
+  bodyAr    String
+  bodyEn    String
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+}
+
+model ListingReport {
+  id         String       @id @default(uuid())
+  listingId  String
+  reporterId String
+  reason     ReportReason
+  details    String?
+  status     ReportStatus @default(PENDING)
+  resolvedBy String?
+  createdAt  DateTime     @default(now())
+  listing    Listing      @relation(fields: [listingId], references: [id])
+  reporter   User         @relation(fields: [reporterId], references: [id])
+}
+
+model PromoCode {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(10, 2)
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  minBooking    Decimal?     @db.Decimal(10, 2)
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+}
+
+model Dispute {
+  id          String        @id @default(uuid())
+  bookingId   String        @unique
+  initiatorId String
+  reason      String
+  details     String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  resolvedBy  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  booking     Booking       @relation(fields: [bookingId], references: [id])
+  initiator   User          @relation("DisputeInitiator", fields: [initiatorId], references: [id])
+}
+
+model UserWarning {
+  id        String          @id @default(uuid())
+  userId    String
+  adminId   String
+  reason    String
+  severity  WarningSeverity @default(LOW)
+  createdAt DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id])
+}
+
+model WebhookLog {
+  id        String   @id @default(uuid())
+  source    String
+  eventType String
+  payload   Json
+  processed Boolean  @default(false)
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PricingOverride {
+  id        String   @id @default(uuid())
+  listingId String
+  date      DateTime @db.Date
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, date])
+}
+
+model Conversation {
+  id            String          @id @default(uuid())
+  listingId     String
+  guestId       String
+  hostId        String
+  lastMessageAt DateTime        @default(now())
+  createdAt     DateTime        @default(now())
+  guest         User            @relation("GuestConversations", fields: [guestId], references: [id])
+  host          User            @relation("HostConversations", fields: [hostId], references: [id])
+  listing       Listing         @relation(fields: [listingId], references: [id])
+  messages      DirectMessage[]
+
+  @@unique([listingId, guestId])
+}
+
+model DirectMessage {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentDirectMessages", fields: [senderId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminEmail String
+  action     String
+  entity     String
+  entityId   String?
+  detail     String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminEmail])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+enum UserRole {
+  GUEST
+  HOST
+  PROPERTY_MANAGER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum PropertyType {
+  APARTMENT
+  CHALET
+  VILLA
+  STUDIO
+  TOWNHOUSE
+  PENTHOUSE
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  REJECTED
+}
+
+enum CancellationPolicy {
+  FLEXIBLE
+  MODERATE
+  STRICT
+}
+
+enum PaymentMethod {
+  CARD
+  FAWRY
+  VODAFONE_CASH
+  MEEZA
+  VALU_BNPL
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  PAYMENT_RECEIVED
+  NEW_REVIEW
+  MESSAGE_RECEIVED
+  LISTING_APPROVED
+  LISTING_REJECTED
+  PAYOUT_PROCESSED
+  SPECIAL_OFFER
+  ACCOUNT_WARNING
+}
+
+enum ReportReason {
+  INACCURATE_PHOTOS
+  WRONG_LOCATION
+  SCAM
+  OFFENSIVE_CONTENT
+  DUPLICATE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum WarningSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ─── Platform Settings ────────────────────────────────────────────────────────
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
