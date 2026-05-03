@@ -32,7 +32,7 @@ export default async function GuestBookingsPage({ params }: { params: Promise<{ 
     orderBy: { createdAt: 'desc' },
   })
 
-  const serialized = bookings.map((b) => ({
+  const serialized = bookings.map((b: typeof bookings[number]) => ({
     id: b.id,
     status: b.status,
     checkIn: b.checkIn.toISOString(),
