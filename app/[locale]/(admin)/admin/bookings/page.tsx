@@ -127,7 +127,7 @@ export default async function AdminBookingsPage({
                   </td>
                 </tr>
               ) : (
-                bookings.map((b) => {
+                bookings.map((b: typeof bookings[number]) => {
                   const sc = statusConfig[b.status] ?? statusConfig.PENDING
                   const guestName = (locale === 'ar' ? b.guest.fullNameAr : b.guest.fullNameEn) ?? b.guest.email
                   const listingTitle = (locale === 'ar' ? b.listing.titleAr : b.listing.titleEn) ?? '—'
