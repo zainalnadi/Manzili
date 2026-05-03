@@ -58,7 +58,7 @@ export default async function BookingConfirmPage({
   const overrides = await prisma.pricingOverride.findMany({
     where: { listingId, date: { gte: checkIn, lt: checkOut } },
   })
-  const overrideMap = new Map(overrides.map((o) => [format(o.date, 'yyyy-MM-dd'), Number(o.price)]))
+  const overrideMap = new Map(overrides.map((o: typeof overrides[number]) => [format(o.date, 'yyyy-MM-dd'), Number(o.price)]))
 
   let nightlyTotal = 0
   for (let i = 0; i < nights; i++) {
