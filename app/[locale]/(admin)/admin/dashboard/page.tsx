@@ -63,7 +63,7 @@ export default async function AdminDashboardPage({ params }: { params: Promise<{
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map(({ label, value, color }) => (
+        {stats.map(({ label, value, color }: typeof stats[number]) => (
           <div key={label} className="bg-white border border-[#EDE0CC] rounded-xl p-5">
             <div className="text-2xl font-bold mb-1" style={{ color }}>{value}</div>
             <p className="text-sm text-[#7A6A5E]">{label}</p>
@@ -136,7 +136,7 @@ export default async function AdminDashboardPage({ params }: { params: Promise<{
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EDE0CC]">
-              {recentBookings.map((b) => (
+              {recentBookings.map((b: typeof recentBookings[number]) => (
                 <tr key={b.id}>
                   <td className="py-2 font-mono text-xs text-[#7A6A5E]">{b.id.slice(0, 8)}...</td>
                   <td className="py-2 font-medium text-[#1C1613]">{formatEGP(Number(b.totalGuestPays), locale)}</td>
