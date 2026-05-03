@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -109,7 +109,7 @@ function Timeline({ currentStatus }: { currentStatus: string }) {
   )
 }
 
-export default function AdminBookingsPage() {
+function AdminBookingsInner() {
   const searchParams = useSearchParams()
   const statusParam = searchParams.get('status') ?? 'ALL'
 
@@ -337,5 +337,13 @@ export default function AdminBookingsPage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function AdminBookingsPage() {
+  return (
+    <Suspense>
+      <AdminBookingsInner />
+    </Suspense>
   )
 }

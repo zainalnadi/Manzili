@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { use, useEffect, useState, useRef, useCallback } from 'react'
+import { use, useEffect, useState, useRef, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -113,7 +113,7 @@ function Avatar({ user, size = 40, locale }: { user: Participant; size?: number;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function MessagesPage({ params }: { params: Promise<{ locale: string }> }) {
+function MessagesInner({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = use(params)
   const isRTL = locale === 'ar'
   const router = useRouter()
@@ -600,5 +600,13 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
         </div>
       </div>
     </div>
+  )
+}
+
+export default function MessagesPage({ params }: { params: Promise<{ locale: string }> }) {
+  return (
+    <Suspense>
+      <MessagesInner params={params} />
+    </Suspense>
   )
 }

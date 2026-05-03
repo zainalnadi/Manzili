@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -90,7 +90,7 @@ const tdStyle: React.CSSProperties = {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 
-export default function AdminListingsPage() {
+function AdminListingsInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const statusParam = searchParams.get('status') ?? 'ALL'
@@ -901,4 +901,12 @@ function pgBtn(disabled: boolean): React.CSSProperties {
     fontWeight: 300,
     cursor: disabled ? 'not-allowed' : 'pointer',
   }
+}
+
+export default function AdminListingsPage() {
+  return (
+    <Suspense>
+      <AdminListingsInner />
+    </Suspense>
+  )
 }

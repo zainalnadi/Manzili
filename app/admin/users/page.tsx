@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -91,7 +91,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export default function AdminUsersPage() {
+function AdminUsersInner() {
   const searchParams = useSearchParams()
   const qParam = searchParams.get('q') ?? ''
 
@@ -419,5 +419,13 @@ export default function AdminUsersPage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function AdminUsersPage() {
+  return (
+    <Suspense>
+      <AdminUsersInner />
+    </Suspense>
   )
 }
