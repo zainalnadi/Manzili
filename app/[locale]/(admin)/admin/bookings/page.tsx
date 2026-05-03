@@ -55,7 +55,7 @@ export default async function AdminBookingsPage({
   const statuses = ['ALL', 'PENDING', 'CONFIRMED', 'CHECKED_IN', 'COMPLETED', 'CANCELLED', 'REJECTED']
   const statusLabels: Record<string, { ar: string; en: string }> = {
     ALL: { ar: 'الكل', en: 'All' },
-    ...Object.fromEntries(Object.entries(statusConfig).map(([k, v]) => [k, { ar: v.ar, en: v.en }])),
+    ...Object.fromEntries(Object.entries(statusConfig).map(([k, v]: [string, { ar: string; en: string; color: string }]) => [k, { ar: v.ar, en: v.en }])),
   }
 
   const headingStyle = isRTL
@@ -77,7 +77,7 @@ export default async function AdminBookingsPage({
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         {/* Status tabs */}
         <div className="flex flex-wrap gap-2">
-          {statuses.map((s) => (
+          {statuses.map((s: typeof statuses[number]) => (
             <a
               key={s}
               href={`?status=${s}${q ? `&q=${q}` : ''}`}

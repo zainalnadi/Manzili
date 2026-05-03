@@ -123,7 +123,7 @@ export default async function AdminUsersPage({
                   </td>
                 </tr>
               ) : (
-                users.map((u) => {
+                users.map((u: typeof users[number]) => {
                   const displayName =
                     (locale === 'ar' ? u.fullNameAr : u.fullNameEn) ??
                     u.email.split('@')[0]
