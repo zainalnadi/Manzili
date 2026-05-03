@@ -60,7 +60,7 @@ export default async function BookingConfirmPage({
   })
   const overrideMap = new Map(overrides.map((o: typeof overrides[number]) => [format(o.date, 'yyyy-MM-dd'), Number(o.price)]))
 
-  let nightlyTotal = 0
+  let nightlyTotal: number = 0
   for (let i = 0; i < nights; i++) {
     const d = new Date(checkIn)
     d.setDate(d.getDate() + i)
