@@ -64,7 +64,7 @@ export default async function BookingConfirmPage({
   for (let i = 0; i < nights; i++) {
     const d = new Date(checkIn)
     d.setDate(d.getDate() + i)
-    nightlyTotal += overrideMap.get(format(d, 'yyyy-MM-dd')) ?? Number(listing.pricePerNight)
+    nightlyTotal += Number(overrideMap.get(format(d, 'yyyy-MM-dd')) ?? listing.pricePerNight)
   }
 
   const cleaningFee = Number(listing.cleaningFee ?? 0)
