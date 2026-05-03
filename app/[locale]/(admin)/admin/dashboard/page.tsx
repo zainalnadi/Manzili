@@ -84,7 +84,7 @@ export default async function AdminDashboardPage({ params }: { params: Promise<{
         </h2>
         {pendingListings.length > 0 ? (
           <div className="space-y-3">
-            {pendingListings.map((l) => {
+            {pendingListings.map((l: typeof pendingListings[number]) => {
               const hostName = locale === 'ar' ? l.host.fullNameAr : l.host.fullNameEn
               const title = locale === 'ar' ? l.titleAr : l.titleEn
               return (
