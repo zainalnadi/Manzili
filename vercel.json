@@ -1,1 +1,1 @@
-{"buildCommand": "next build"}
+{"buildCommand": "prisma generate && next build"}
