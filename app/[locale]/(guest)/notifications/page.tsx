@@ -124,15 +124,15 @@ export default async function NotificationsPage({
   })
 
   // Mark all unread as read (fire and forget — no need to await in rendering)
-  if (notifications.some((n) => !n.isRead)) {
+  if (notifications.some((n: typeof notifications[number]) => !n.isRead)) {
     await prisma.notification.updateMany({
       where: { userId: user.id, isRead: false },
       data: { isRead: true },
     })
   }
 
-  const unread = notifications.filter((n) => !n.isRead)
-  const read = notifications.filter((n) => n.isRead)
+  const unread = notifications.filter((n: typeof notifications[number]) => !n.isRead)
+  const read = notifications.filter((n: typeof notifications[number]) => n.isRead)
 
   return (
     <div
@@ -178,7 +178,7 @@ export default async function NotificationsPage({
                 {locale === 'ar' ? 'جديد' : 'New'}
               </h2>
               <div className="space-y-2">
-                {unread.map((notif) => (
+                {unread.map((notif: typeof notifications[number]) => (
                   <NotificationRow
                     key={notif.id}
                     notif={notif as NotifItem}
@@ -199,7 +199,7 @@ export default async function NotificationsPage({
                 </h2>
               )}
               <div className="space-y-2">
-                {read.map((notif) => (
+                {read.map((notif: typeof notifications[number]) => (
                   <NotificationRow
                     key={notif.id}
                     notif={notif as NotifItem}
