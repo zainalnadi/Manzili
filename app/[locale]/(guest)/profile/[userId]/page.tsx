@@ -62,7 +62,7 @@ export default async function PublicProfilePage({
   const joinYear = new Date(profileUser.createdAt).getFullYear()
 
   const avgRating = profileUser.reviews.length > 0
-    ? (profileUser.reviews.reduce((sum, r) => sum + r.overallRating, 0) / profileUser.reviews.length).toFixed(1)
+    ? (profileUser.reviews.reduce((sum: number, r: typeof profileUser.reviews[number]) => sum + r.overallRating, 0) / profileUser.reviews.length).toFixed(1)
     : null
 
   const headingStyle = isRTL
